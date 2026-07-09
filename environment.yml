@@ -1,0 +1,20 @@
+name: csa-rag
+channels:
+  - pytorch
+  - nvidia
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - pip
+  - git
+  - cmake
+  - ninja
+  - pkg-config
+  - gxx_linux-64
+  - pytorch=2.6.*
+  - torchvision
+  - torchaudio
+  - pytorch-cuda=12.4
+  - pip:
+      - -r requirements.txt
