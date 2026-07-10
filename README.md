@@ -1,226 +1,174 @@
 # State-Guided Agentic RAG for Multi-Hop Question Answering
 
-This repository implements a state-guided agentic Retrieval-Augmented Generation framework for multi-hop question answering.
+This repository provides the implementation of State-Guided Agentic
+Retrieval-Augmented Generation (State-Guided RAG) for multi-hop question
+answering.
 
-The core idea is to formulate multi-hop QA as an iterative state resolution process. Instead of allowing an LLM agent to decide its next retrieval action only from implicit reasoning history, the system maintains an explicit, evidence-grounded knowledge state and uses it to guide retrieval, evidence completion, retry, stopping, and answer grounding.
+The framework formulates multi-hop QA as an iterative state resolution
+process. Instead of relying only on implicit LLM reasoning history, it
+maintains an explicit evidence-grounded state containing unresolved
+slots, dependency relations, candidate values, confirmed evidence, and
+conflicts. The state guides retrieval, verification, retry, stopping,
+and answer grounding.
 
-## Motivation
+## Overview
 
-Standard RAG usually follows a retrieve-then-read pipeline:
+Traditional RAG follows:
 
-    question -> retrieve passages -> generate answer
+Question -\> Retrieve -\> Read -\> Answer
 
-This paradigm is often insufficient for multi-hop QA, where the answer depends on intermediate entities, relations, and evidence dependencies distributed across multiple documents.
+State-Guided RAG introduces:
 
-Agentic RAG methods introduce iterative retrieval and reasoning actions, but their next actions are often decided from implicit LLM reasoning histories. This makes the agent vulnerable to unsupported action decisions and hallucination propagation.
+Question -\> State Initialization -\> State-Guided Retrieval -\>
+Evidence Collection -\> State Update -\> Verification/Retry -\> Answer
+Grounding
 
-Our framework argues that the key missing component in agentic RAG is not simply more actions, but an explicit evidence-grounded state that justifies and controls those actions.
+## Core Components
 
-## Method Overview
+The state contains:
 
-The framework maintains an explicit knowledge state during inference. The state contains:
+-   unresolved slots
+-   dependency relations
+-   candidate values
+-   confirmed evidence
+-   conflicts
 
-- unresolved slots;
-- dependency relations;
-- candidate values;
-- confirmed evidence;
-- conflicts.
+The state controls:
 
-At each step, the state is updated with retrieved evidence and then used to guide the next action.
-
-The overall pipeline is:
-
-    Question
-      -> State Initialization
-      -> State-Guided Retrieval
-      -> Evidence-Grounded State Update
-      -> Retry / Second-Hop Retrieval / Dependency Query
-      -> Answer Grounding
-      -> Final Answer
-
-## Main Features
-
-- Explicit state modeling for multi-hop QA;
-- State-guided retrieval control;
-- Evidence-grounded state update;
-- Dependency-aware query construction;
-- Second-hop retrieval;
-- Typed retry;
-- Answer grounding;
-- Evaluation on HotpotQA, 2Wiki, and MuSiQue;
-- Ablation and step-budget analysis;
-- Efficiency and token-cost profiling.
+-   dependency-aware retrieval
+-   second-hop retrieval
+-   typed retry
+-   conflict resolution
+-   answer grounding
 
 ## Repository Structure
 
-    .
-    ├── configs/
-    ├── scripts/
-    ├── src/
-    │   └── csa_rag/
-    ├── README.md
-    └── requirements.txt
+    configs/
+    prompts/
+    scripts/
+    src/
+    docs/
+    examples/
+    data/
+    outputs/
+    logs/
 
-Large files such as datasets, FAISS indexes, model checkpoints, experiment outputs, logs, and cache files are intentionally excluded from this open-source package.
+Large resources such as datasets, checkpoints, indexes, and experiment
+outputs are excluded.
 
-## Installation
+## Environment Setup
 
-Create an environment and install dependencies:
+Recommended:
+
+-   Python \>= 3.10
+-   CUDA \>= 12.0
+-   PyTorch \>= 2.3
+
+Installation:
 
     conda create -n state-rag python=3.10 -y
     conda activate state-rag
     pip install -r requirements.txt
 
-You may need to modify paths in the configuration files according to your local environment.
+## Model Preparation
 
-## External Resources
+Required models:
 
-This repository does not include datasets, indexes, or model weights.
+LLM: Qwen3-14B (default experimental model)
 
-Please prepare the following resources separately:
+Embedding: BAAI/bge-m3
 
-- HotpotQA
-- 2WikiMultiHopQA
-- MuSiQue
-- Qwen3 model weights
-- BGE embedding model
-- BGE reranker
-- Dense retrieval indexes
+Reranker: BAAI/bge-reranker-large
 
-Example dataset paths:
+## Dataset Preparation
 
-    /path/to/dataset/hotpot/hotpot_dev_distractor_v1.json
-    /path/to/dataset/2Wiki/dev.json
-    /path/to/dataset/musique/musique_ans_v1.0_dev.jsonl
+Supported datasets:
 
-Example index paths:
+-   HotpotQA
+-   2WikiMultiHopQA
+-   MuSiQue
 
-    data/indexes/hotpot/
-    data/indexes/2wiki/
-    data/indexes/musique/
+Data processing:
+
+1.  Load raw QA files.
+2.  Convert questions, answers, contexts, and supporting facts into
+    unified format.
+3.  Build retrieval corpus.
+4.  Encode corpus with BGE-M3.
+5.  Construct FAISS indexes.
+6.  Store metadata mapping embeddings to documents.
+
+Generated index files:
+
+    data/indexes/
+    ├── index.faiss
+    ├── embeddings.npy
+    └── metadata.jsonl
 
 ## Running Evaluation
 
-HotpotQA example:
+Example:
 
     export PYTHONPATH=src
-    export CUDA_VISIBLE_DEVICES=0
 
-    python -u scripts/run_hotpot_eval.py \
-      --dataset-path /path/to/hotpot_dev_distractor_v1.json \
-      --index-dir data/indexes/hotpot \
-      --models-config configs/main_ablations/main_full_14b.yaml \
-      --output-path outputs/hotpot_dev_predictions.jsonl \
-      --limit 500 \
-      --offset 0
+    python scripts/run_hotpot_eval.py  --dataset-path /path/to/data  --index-dir data/indexes/hotpot  --models-config configs/main_ablations/main_full_14b.yaml  --limit 500
 
-2Wiki example:
+Similar scripts are provided for 2Wiki and MuSiQue.
 
-    export PYTHONPATH=src
-    export CUDA_VISIBLE_DEVICES=0
+## Configuration
 
-    python -u scripts/run_2wiki_eval.py \
-      --dataset-path /path/to/2Wiki/dev.json \
-      --index-dir data/indexes/2wiki \
-      --models-config configs/main_ablations/main_full_14b.yaml \
-      --output-path outputs/2wiki_dev_predictions.jsonl \
-      --limit 500 \
-      --offset 0
+Generation uses deterministic decoding:
 
-MuSiQue example:
-
-    export PYTHONPATH=src
-    export CUDA_VISIBLE_DEVICES=0
-
-    python -u scripts/run_musique_eval.py \
-      --dataset-path /path/to/musique_ans_v1.0_dev.jsonl \
-      --index-dir data/indexes/musique \
-      --models-config configs/main_ablations/main_full_14b.yaml \
-      --output-path outputs/musique_dev_predictions.jsonl \
-      --limit 500 \
-      --offset 0
+    temperature=0.0
+    do_sample=false
+    top_p=1.0
 
 ## Evaluation Metrics
 
-The project reports:
+The framework reports:
 
-- Exact Match;
-- token-level F1;
-- average state steps;
-- error count;
-- inference time;
-- LLM call count;
-- tokenizer-estimated token cost.
+-   Exact Match
+-   token-level F1
+-   average state steps
+-   inference latency
+-   LLM calls
+-   token consumption
 
-Metric computation example:
+## Ablation and Analysis
 
-    python scripts/eval_em_f1.py \
-      --predictions outputs/hotpot_dev_predictions.jsonl \
-      --output outputs/hotpot_metrics.json
+Supported studies include:
 
-## Ablation Study
+-   state-only ablation
+-   question-type ablation
+-   state optimization ablation
+-   step-budget analysis
+-   token-cost profiling
 
-Main ablation variants include:
+## Reproducibility
 
-- main_state_only_14b;
-- main_no_question_type_14b;
-- main_no_state_optimization_14b;
-- main_full_14b.
+Steps:
 
-Example:
-
-    bash scripts/run_main_ablation_limit.sh main_full_14b hotpot 500 0
-
-## Step-Budget Analysis
-
-Example:
-
-    bash scripts/run_fixed_step_limit.sh 3 hotpot 100 0
-
-This evaluates the model with a fixed state-step budget of 3 on 100 HotpotQA examples.
-
-## Token Cost Profiling
-
-Token consumption is estimated over all LLM calls. For each question, every prompt input and model-generated output is tokenized with the Qwen tokenizer and summed over the full inference process.
-
-Example:
-
-    python scripts/profile_ours_all_llm_tokens_500.py \
-      --dataset-name hotpot \
-      --dataset-path /path/to/hotpot_dev_distractor_v1.json \
-      --index-dir data/indexes/hotpot \
-      --models-config configs/main_ablations/main_full_14b.yaml \
-      --tokenizer-path /path/to/Qwen3-14B \
-      --limit 500 \
-      --offset 0 \
-      --output-summary outputs/llm_token_profile/hotpot_summary.json \
-      --output-details outputs/llm_token_profile/hotpot_details.jsonl
+1.  Install dependencies.
+2.  Download datasets.
+3.  Download model weights.
+4.  Build retrieval indexes.
+5.  Modify configuration paths.
+6.  Run evaluation scripts.
 
 ## Notes
 
-This repository is released as source code only. It does not include:
+Not included:
 
-- raw datasets;
-- processed datasets;
-- FAISS indexes;
-- model weights;
-- reranker weights;
-- experiment outputs;
-- logs;
-- checkpoints;
-- cache files.
+-   datasets
+-   model weights
+-   FAISS indexes
+-   generated outputs
+-   logs
+-   cache files
 
-Please download datasets and models from their official sources and update configuration paths accordingly.
-
-## Citation
-
-    @misc{state_guided_agentic_rag,
-      title = {State-Guided Agentic Retrieval-Augmented Generation for Multi-Hop Question Answering},
-      author = {Anonymous},
-      year = {2026},
-      note = {Code release}
-    }
+Users should download required resources separately.
 
 ## License
 
-Please add an appropriate open-source license before public release, such as MIT, Apache-2.0, or another license approved by your institution.
+Please add an appropriate open-source license before public release,
+such as MIT or Apache-2.0.
