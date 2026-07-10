@@ -1,0 +1,68 @@
+runtime:
+  device: cuda
+  dtype: bfloat16
+  seed: 42
+  use_vllm: true
+  llm_backend: vllm
+llm:
+  backend: vllm
+  default_model: /mnt/raid/zsb/llm_models/Qwen3-14B
+  fallback_model: /mnt/raid/peiyu/models/Qwen2.5-14B-Instruct
+  high_accuracy_model: /mnt/raid/zsb/llm_models/Qwen3-32B
+  max_model_len: 4096
+  max_new_tokens: 512
+  temperature: 0.6
+  top_p: 0.95
+  top_k: 20
+  thinking: false
+embedding:
+  model_name: /mnt/raid/peiyu/models/bge-m3
+  normalize: true
+  max_length: 2048
+  batch_size: 16
+reranker:
+  model_name: /mnt/raid/peiyu/models/bge-reranker-v2-m3
+  use_fp16: true
+  top_k: 10
+entity:
+  model_name: ''
+  labels:
+  - person
+  - organization
+  - location
+  - date
+  - event
+  - work
+  - nationality
+  - position
+retrieval:
+  top_k_dense: 12
+  top_k_rerank: 5
+  min_chunk_chars: 150
+  max_chunk_chars: 600
+  chunk_overlap: 80
+agent:
+  max_steps: 7
+  stop_confidence: 0.83
+  stop_if_no_missing_slots: true
+  slot_confidence_floor: 0.25
+  max_evidence_per_step: 3
+pipeline:
+  enable_typed_question_spec: true
+  enable_second_hop: true
+  enable_dependency_query: true
+  enable_title_hop: true
+  enable_typed_retry: true
+  enable_typed_answer_grounding: true
+  enable_typed_target_selector: false
+  fixed_steps: 7
+  fixed_step_limit: 7
+  fixed_max_steps: 7
+  max_steps: 7
+  max_reasoning_steps: 7
+  max_iterations: 7
+  step_budget: 7
+  num_steps: 7
+  force_fixed_steps: true
+  disable_early_stop: true
+  enable_early_stop: false

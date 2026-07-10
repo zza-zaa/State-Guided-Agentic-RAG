@@ -1,0 +1,156 @@
+[
+  {
+    "dataset": "hotpot",
+    "question": "Were Scott Derrickson and Ed Wood of the same nationality?",
+    "expect": {
+      "relation_family": "comparison_or_boolean",
+      "operator_type": "boolean_conjunction",
+      "answer_type": "boolean"
+    }
+  },
+  {
+    "dataset": "hotpot",
+    "question": "Are the Laleli Mosque and Esma Sultan Mansion located in the same neighborhood?",
+    "expect": {
+      "relation_family": "comparison_or_boolean",
+      "operator_type": "boolean_conjunction",
+      "answer_type": "boolean"
+    }
+  },
+  {
+    "dataset": "hotpot",
+    "question": "The arena where the Lewiston Maineiacs played their home games can seat how many people?",
+    "expect": {
+      "relation_family": "entity_attribute",
+      "answer_type": "number"
+    }
+  },
+  {
+    "dataset": "hotpot",
+    "question": "What government position was held by the woman who portrayed Corliss Archer in the film Kiss and Tell?",
+    "expect": {
+      "relation_family": "entity_attribute",
+      "answer_type": "position"
+    }
+  },
+  {
+    "dataset": "hotpot",
+    "question": "Which writer was from England, Henry Roth or Robert Erskine Childers?",
+    "expect": {
+      "relation_family": "comparison_or_boolean",
+      "operator_type": "comparison"
+    }
+  },
+  {
+    "dataset": "hotpot",
+    "question": "Which performance act has a higher instrument to person ratio, Badly Drawn Boy or Wolf Alice?",
+    "expect": {
+      "relation_family": "comparison_or_boolean",
+      "operator_type": "comparison"
+    }
+  },
+  {
+    "dataset": "hotpot",
+    "question": "Kaiser Ventures corporation was founded by an American industrialist who became known as the father of modern American shipbuilding?",
+    "expect": {
+      "relation_family": "entity_attribute",
+      "operator_type": "lookup",
+      "answer_type": "person"
+    }
+  },
+  {
+    "dataset": "hotpot",
+    "question": "Which professional ice hockey position does the Captain of the National Hockey League All-Star Game \"Away Team\" play?",
+    "expect": {
+      "relation_family": "entity_attribute",
+      "answer_type": "position"
+    }
+  },
+  {
+    "dataset": "hotpot",
+    "question": "Which country did the Falkland Islands beat in the 2010 Commonwealth games that has eleven administrative divisions?",
+    "expect": {
+      "relation_family": "entity_attribute",
+      "answer_type": "country_or_nationality"
+    }
+  },
+  {
+    "dataset": "musique",
+    "question": "Who founded the company that distributed the film UHF?",
+    "expect": {
+      "relation_family": "entity_attribute",
+      "answer_type": "person",
+      "chain_depth_hint": 2
+    }
+  },
+  {
+    "dataset": "musique",
+    "question": "Which company owns the manufacturer of Learjet 60?",
+    "expect": {
+      "relation_family": "entity_attribute",
+      "answer_type": "organization",
+      "chain_depth_hint": 2
+    }
+  },
+  {
+    "dataset": "musique",
+    "question": "What administrative territorial entity is the owner of Ciudad Deportiva located?",
+    "expect": {
+      "relation_family": "entity_attribute",
+      "answer_granularity": "admin_entity_exact"
+    }
+  },
+  {
+    "dataset": "musique",
+    "question": "What league does the team that plays in Stadio Ciro Vigorito play for?",
+    "expect": {
+      "relation_family": "entity_attribute",
+      "answer_type": "league"
+    }
+  },
+  {
+    "dataset": "musique",
+    "question": "What instrument is played by the person from The Blackout All-Stars?",
+    "expect": {
+      "relation_family": "entity_attribute",
+      "answer_type": "instrument"
+    }
+  },
+  {
+    "dataset": "musique",
+    "question": "What record label did the person who is part of The Bruce Lee Band start?",
+    "expect": {
+      "relation_family": "entity_attribute",
+      "answer_type": "record_label"
+    }
+  },
+  {
+    "dataset": "2wiki",
+    "question": "Who is the maternal grandfather of Amadeus Vii, Count Of Savoy?",
+    "expect": {
+      "relation_family": "kinship",
+      "operator_type": "kinship_composition",
+      "answer_type": "person",
+      "chain_depth_hint": 3
+    }
+  },
+  {
+    "dataset": "2wiki",
+    "question": "Who is the paternal grandmother of John Iii, Duke Of Cleves?",
+    "expect": {
+      "relation_family": "kinship",
+      "operator_type": "kinship_composition",
+      "answer_type": "person",
+      "chain_depth_hint": 3
+    }
+  },
+  {
+    "dataset": "2wiki",
+    "question": "Who is the father of Beltrán Vélez De Guevara, Marquis Of Campo Real?",
+    "expect": {
+      "relation_family": "kinship",
+      "operator_type": "lookup",
+      "answer_type": "person"
+    }
+  }
+]

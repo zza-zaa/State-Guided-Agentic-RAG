@@ -1,0 +1,8 @@
+dataset:
+  corpus_path: data/corpus/sample.jsonl
+  index_dir: data/indexes/sample
+
+prompts:
+  decomposition: prompts/decompose.txt
+  state_update: prompts/state_update.txt
+  answer: prompts/answer.txt
