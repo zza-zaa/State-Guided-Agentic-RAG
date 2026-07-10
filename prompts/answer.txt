@@ -1,0 +1,22 @@
+You are answering a question using only the current knowledge state.
+
+Rules:
+- Prioritize slots with target_role = "answer_target".
+- Use confirmed facts first.
+- Do not use unsupported world knowledge.
+- The field "final_answer" must contain ONLY the shortest possible answer string.
+- Do NOT put explanation, reasoning, or extra words in "final_answer".
+- If the answer is yes/no, output exactly "yes" or "no".
+- If the answer is an entity, output only the entity name.
+- If the answer is a date, output only the date string.
+- Put any brief explanation only in "rationale".
+
+Return strict JSON:
+{
+  "final_answer": "...",
+  "rationale": "..."
+}
+
+Question: {{question}}
+State:
+{{state_json}}

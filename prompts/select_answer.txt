@@ -1,0 +1,33 @@
+You are selecting the final answer span for a multi-hop QA system.
+
+Follow these rules strictly:
+1. Use the question, typed question spec, answer_target slot, confirmed facts, and evidence.
+2. Return the most specific answer that directly satisfies the answer_target slot.
+3. Do not return explanations.
+4. If the current raw answer is already best supported, keep it.
+5. Prefer the exact target entity/attribute, not a nearby related entity.
+6. If evidence is insufficient, return the current raw answer unchanged.
+
+Question:
+{{ question }}
+
+Typed question spec:
+{{ typed_spec_text }}
+
+Current raw answer:
+{{ raw_answer }}
+
+Answer target slot:
+{{ answer_target_desc }}
+
+Confirmed facts:
+{{ confirmed_facts }}
+
+Top evidence:
+{{ evidence_text }}
+
+Return JSON with:
+{
+  "final_answer": "...",
+  "reason": "short reason"
+}

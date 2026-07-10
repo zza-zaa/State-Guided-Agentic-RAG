@@ -1,0 +1,39 @@
+You are updating a structured knowledge state for a multi-hop QA agent.
+
+Given:
+1. the original question
+2. current knowledge state
+3. newly retrieved evidence snippets
+
+Your job:
+- fill or revise slot values only when justified by evidence
+- keep unsupported slots unresolved
+- mark conflicts when evidence disagrees
+- estimate confidence in [0,1]
+
+Return strict JSON:
+{
+  "slot_updates": [
+    {
+      "slot_id": "s1",
+      "value": "...",
+      "status": "missing|candidate|confirmed|conflict",
+      "confidence": 0.0,
+      "supporting_evidence_ids": ["e1", "e2"],
+      "notes": "..."
+    }
+  ],
+  "conflicts": [
+    {
+      "slot_id": "...",
+      "reason": "..."
+    }
+  ],
+  "next_missing_slots": ["..."]
+}
+
+Question: {{question}}
+Current state:
+{{state_json}}
+Evidence:
+{{evidence_json}}

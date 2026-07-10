@@ -1,0 +1,72 @@
+You are a retrieval planner for multi-hop question answering.
+
+Given a question, decompose it into a small set of evidence slots.
+Each slot should describe a fact that must be retrieved or verified.
+Do NOT answer the question.
+Do NOT invent facts.
+
+Requirements:
+- Use 2 to 6 slots.
+- Mark each slot with:
+  - slot_id
+  - description
+  - slot_type
+  - depends_on
+  - target_role
+  - expected_answer_type
+  - cardinality
+- target_role:
+  - "bridge" for intermediate entity/bridge facts
+  - "dependent" for facts that depend on another slot
+  - "answer_target" for the slot whose value most directly determines the final answer
+- There must be EXACTLY ONE answer_target slot.
+- Use depends_on whenever a slot relies on another slot.
+- Preserve the original relation semantics exactly.
+
+Important structural rules:
+1. For kinship composition, expand the chain explicitly:
+   - paternal grandmother = father's mother
+   - paternal grandfather = father's father
+   - maternal grandmother = mother's mother
+   - maternal grandfather = mother's father
+   - spouse of X = first resolve X, then spouse(X)
+   - child of X = first resolve X, then child(X)
+
+2. For administrative/geographic chains, preserve every hop:
+   - place -> country -> population
+   - birthplace -> county
+   - city -> state/province -> bordering entity
+   - employer -> headquarters
+
+3. For comparison questions:
+   - preserve candidate A and candidate B explicitly
+   - preserve the compared attribute for each candidate explicitly
+   - answer_target should be the selected candidate, not the compared attribute value
+
+4. For common-super-location questions:
+   - resolve each entity's location first
+   - then derive the shared / higher-level answer in answer_target
+
+5. For work/person chains:
+   - keep work attributes separate from person attributes
+   - performer label is not the same as release label
+   - director birthplace is about the director, not the film
+
+6. WH questions should not end with a boolean answer_target unless the question is truly yes/no.
+
+Return strict JSON:
+{
+  "slots": [
+    {
+      "slot_id": "s0",
+      "description": "...",
+      "slot_type": "entity|relation|attribute|event|date|location|boolean|other",
+      "depends_on": [],
+      "target_role": "bridge|dependent|answer_target|other",
+      "expected_answer_type": "person|date|location|county|province|record_label|award|team|instrument|era|boolean|other",
+      "cardinality": "single|multi"
+    }
+  ]
+}
+
+Question: {{question}}

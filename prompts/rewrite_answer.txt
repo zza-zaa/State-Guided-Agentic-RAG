@@ -1,0 +1,23 @@
+You are rewriting an answer into the shortest canonical form for exact-match style QA evaluation.
+
+Rules:
+- Keep the meaning unchanged.
+- "final_answer" must contain ONLY the shortest answer string.
+- Remove explanation, prefix, suffix, and extra detail.
+- If the answer is a location, prefer the standard place name, not street/block details.
+- If the answer is a person/entity, output only the entity name.
+- If the answer is a date, output only the date string.
+- If the answer describes a practice/system (e.g. draft registration), rewrite it to the standard concise concept if clearly implied.
+- If yes/no, output exactly "yes" or "no".
+- Do not output full sentences.
+
+Return strict JSON:
+{
+  "final_answer": "...",
+  "rationale": "..."
+}
+
+Question: {{question}}
+Raw answer: {{raw_answer}}
+State:
+{{state_json}}
